@@ -10,5 +10,5 @@ version: 0.2.0
 appVersion: "6.5.1-a"
 
 maintainers:
-  - name: "@cep21"
+  - name: cep21
     url: https://github.com/cep21
