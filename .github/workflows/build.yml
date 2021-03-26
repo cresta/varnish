@@ -13,6 +13,10 @@ jobs:
         uses: reviewdog/action-hadolint@v1
         with:
           github_token: ${{ secrets.github_token }}
+      - name: shellcheck
+        uses: reviewdog/action-shellcheck@v1
+        with:
+          github_token: ${{ secrets.github_token }}
       - name: Build docker
         run: ./make.sh build_docker
       - name: Login to GitHub Container Registry
