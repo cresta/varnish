@@ -12,6 +12,7 @@ REPO=${GITHUB_REPOSITORY-unset}
 TAG=${TAG-${GITHUB_SHA-latest}}
 # The docker image is the repository and tag together
 IMAGE=${IMAGE-"${CONTAINER_REGISTRY}/${REPO}:${TAG}"}
+X=hello
 
 function build_docker() {
     docker build -t "${IMAGE}" .
