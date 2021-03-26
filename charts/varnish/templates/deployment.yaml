@@ -13,8 +13,10 @@ spec:
       {{- include "varnish.selectorLabels" . | nindent 6 }}
   template:
     metadata:
-      {{- with .Values.podAnnotations }}
       annotations:
+        checksum/varnish: {{ include (print $.Template.BasePath "/configmap-vcl.yaml") . | sha256sum }} 
+        checksum/nginx: {{ include (print $.Template.BasePath "/configmap-nginx.yaml") . | sha256sum }} 
+      {{- with .Values.podAnnotations }}
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
@@ -26,26 +28,30 @@ spec:
       {{- end }}
       serviceAccountName: {{ include "varnish.serviceAccountName" . }}
       volumes:
+        - name: shared-varnish
+          emptyDir: {}
         - name: vcl
           configMap:
-            name: {{ include "varnish.fullname" . }}
+            name: {{ include "varnish.fullname" . }}-varnish
         - name: nginx
           configMap:
             name: {{ include "varnish.fullname" . }}-nginx
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
-        - name: {{ .Chart.Name }}-varnish
+        - name: varnish
           securityContext:
-            {{- toYaml .Values.securityContext | nindent 12 }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
+            {{- toYaml .Values.varnish.securityContext | nindent 12 }}
+          image: "{{ .Values.varnish.image.repository }}:{{ .Values.varnish.image.tag }}"
+          imagePullPolicy: {{ .Values.varnish.image.pullPolicy }}
           volumeMounts:
             - mountPath: /etc/varnish
               name: vcl
+            - mountPath: /var/lib/varnish
+              name: shared-varnish
           env:
             - name: VARNISH_SIZE
-              value: {{ .Values.varnishSize | quote }}
+              value: {{ .Values.varnish.varnishSize | quote }}
           ports:
             - name: http
               containerPort: 80
@@ -60,11 +66,22 @@ spec:
               port: http
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
-        - name: {{ .Chart.Name }}-nginx
+        - name: varnishncsa
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.varnishncsa.image.repository }}:{{ .Values.varnishncsa.image.tag }}"
+          command: ["varnishncsa"]
+          imagePullPolicy: {{ .Values.varnishncsa.image.pullPolicy }}
+          volumeMounts:
+            - mountPath: /var/lib/varnish
+              name: shared-varnish
+          resources:
+            {{- toYaml .Values.varnishncsa.resources | nindent 12 }}
+        - name: nginx
+          securityContext:
+            {{- toYaml .Values.nginx.securityContext | nindent 12 }}
           image: "{{ .Values.nginx.image.repository }}:{{ .Values.nginx.image.tag }}"
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          imagePullPolicy: {{ .Values.image.nginx.pullPolicy }}
           volumeMounts:
             - mountPath: /etc/nginx
               name: nginx
@@ -81,7 +98,7 @@ spec:
               path: /health
               port: http
           resources:
-            {{- toYaml .Values.resources | nindent 12 }}
+            {{- toYaml .Values.nginx.resources | nindent 12 }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
