@@ -1,0 +1,4 @@
+# reviewdog.yml
+
+runner:
+  hadolint:
