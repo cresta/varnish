@@ -1,0 +1,28 @@
+name: Release Charts
+
+on: [push, pull_request]
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Run chart-testing (lint)
+        id: lint
+        uses: helm/chart-testing-action@v1.0.0
+        with:
+          command: lint
+      - name: Create kind cluster
+        uses: helm/kind-action@v1.0.0
+      - name: Install helm chart
+        run:  helm install varnish ./charts/varnish
+      - name: Wait for deployment to finish
+        timeout-minutes: 1
+        run:  kubectl rollout status --watch deployment/varnish
+      - name: Test helm chart
+        run:  helm test varnish
+      - name: Remove helm chart
+        run:  helm uninstall varnish
