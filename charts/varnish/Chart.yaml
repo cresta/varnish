@@ -1,6 +1,7 @@
 apiVersion: v2
 name: varnish
 description: A Helm chart for varnish on Kubernetes
+home: https://github.com/cresta/varnish
 
 type: application
 
