@@ -3,8 +3,6 @@
 ARG VARNISH_VERSION=6.5.1
 FROM varnish:${VARNISH_VERSION} AS builder
 
-RUN cd /hello && echo "hi"
-
 # Adapted from https://knplabs.com/en/blog/how2tip-varnish-dynamic-backend-dns-resolution-in-a-docker-swarm-context
 # Define env vars for VMOD build
 ENV PKG_CONFIG_PATH /usr/local/lib/pkgconfig
