@@ -14,7 +14,7 @@ TAG=${TAG-${GITHUB_SHA-latest}}
 IMAGE=${IMAGE-"${CONTAINER_REGISTRY}/${REPO}:${TAG}"}
 
 function build_docker() {
-    docker build --build-arg "BUILDER_IMAGE=${BUILDER_IMAGE}" -t "${IMAGE}" .
+    docker build -t "${IMAGE}" .
 }
 
 function docker_tags() {
