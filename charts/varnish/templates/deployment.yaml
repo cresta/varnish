@@ -29,10 +29,13 @@ spec:
         - name: vcl
           configMap:
             name: {{ include "varnish.fullname" . }}
+        - name: nginx
+          configMap:
+            name: {{ include "varnish.fullname" . }}-nginx
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
-        - name: {{ .Chart.Name }}
+        - name: {{ .Chart.Name }}-varnish
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
@@ -46,6 +49,28 @@ spec:
           ports:
             - name: http
               containerPort: 80
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+        - name: {{ .Chart.Name }}-nginx
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.nginx.image.repository }}:{{ .Values.nginx.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          volumeMounts:
+            - mountPath: /etc/nginx
+              name: nginx
+          ports:
+            - name: http
+              containerPort: 81
               protocol: TCP
           livenessProbe:
             httpGet:

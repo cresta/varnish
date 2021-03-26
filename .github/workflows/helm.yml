@@ -29,11 +29,11 @@ jobs:
         uses: helm/kind-action@v1.0.0
       - name: Install helm chart
         run:  helm install varnish ./charts/varnish
-      - name: Wait for deployment to finish
-        timeout-minutes: 1
-        run:  kubectl rollout status --watch deployment/varnish
-      - name: Test helm chart
-        run:  helm test varnish
+        #      - name: Wait for deployment to finish
+        #        timeout-minutes: 1
+        #        run:  kubectl rollout status --watch deployment/varnish
+        #      - name: Test helm chart
+        #        run:  helm test varnish
       - name: Remove helm chart
         run:  helm uninstall varnish
       - name: Run chart-releaser
