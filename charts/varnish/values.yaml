@@ -4,6 +4,24 @@
 
 replicaCount: 1
 
+nginx:
+  image:
+    repository: nginx
+    tag: latest
+  config:
+    nginx.conf: |-
+      
+      http {
+        server { # simple reverse-proxy
+          listen       81;
+      
+          # pass requests for dynamic content to rails/turbogears/zope, et al
+          location / {
+            proxy_pass      http://127.0.0.1:8080;
+          }
+        }
+      }
+
 image:
   repository: ghcr.io/cresta/varnish
   pullPolicy: IfNotPresent
