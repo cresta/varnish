@@ -1,9 +1,14 @@
 apiVersion: v2
 name: varnish
 description: A Helm chart for varnish on Kubernetes
+home: https://github.com/cresta/varnish
 
 type: application
 
-version: 0.1.0
+version: 0.2.0
 
 appVersion: "6.5.1-a"
+
+maintainers:
+  - name: cep21
+    url: https://github.com/cep21

@@ -1,38 +1,116 @@
-# Default values for varnish.
-# This is a YAML-formatted file.
-# Declare variables to be passed into your templates.
-
 replicaCount: 1
 
 nginx:
   image:
     repository: nginx
-    tag: latest
+    pullPolicy: IfNotPresent
+    tag: 1.19.8
+  resources: {}
+    # limits:
+    #   cpu: 100m
+    #   memory: 128Mi
+    # requests:
+    #   cpu: 100m
+    #   memory: 128Mi
+  securityContext: {}
+    # capabilities:
+    #   drop:
+    #   - ALL
+    # readOnlyRootFilesystem: true
+    # runAsNonRoot: true
+    # runAsUser: 1000
   config:
     nginx.conf: |-
-      
+      events {}
       http {
-        server { # simple reverse-proxy
+        server {
           listen       81;
-      
-          # pass requests for dynamic content to rails/turbogears/zope, et al
+          location /health {
+            return 200 'status: ok';
+            access_log off;
+          }
+
           location / {
-            proxy_pass      http://127.0.0.1:8080;
+            resolver kube-dns.kube-system.svc.cluster.local ipv6=off;
+            proxy_pass https://$http_x_should_go_to;
+            proxy_set_header Host $http_x_should_go_to;
           }
         }
       }
 
-image:
-  repository: ghcr.io/cresta/varnish
-  pullPolicy: IfNotPresent
-  # Overrides the image tag whose default is the chart appVersion.
-  tag: ""
+varnish:
+  image:
+    repository: varnish
+    pullPolicy: IfNotPresent
+    tag: 6.5.1
+  varnishSize: 100M
+  resources: {}
+    # limits:
+    #   cpu: 100m
+    #   memory: 128Mi
+    # requests:
+    #   cpu: 100m
+    #   memory: 128Mi
+  securityContext: {}
+    # capabilities:
+    #   drop:
+    #   - ALL
+    # readOnlyRootFilesystem: true
+    # runAsNonRoot: true
+    # runAsUser: 1000
+  vcl:
+    default.vcl: |-
+        vcl 4.0;
+        import cookie;
+        backend default {
+            .host = "localhost";
+            .port = "81";
+        }
+        sub vcl_init {
+        }
+        sub vcl_recv {
+          if (req.method == "GET" && req.url == "/health") {
+            return(synth(200, "OK"));
+          }
+          set req.http.x-should-go-to = "www.example.com";
+          set req.backend_hint = default;
+        }
+        sub vcl_backend_response {
+          return (deliver);
+        }
+        sub vcl_deliver {
+          if (obj.hits > 0) {
+            set resp.http.X-Cache = "HIT";
+          } else {
+            set resp.http.X-Cache = "MISS";
+          }
+        }
 
-imagePullSecrets: []
+varnishncsa:
+  image:
+    repository: varnish
+    pullPolicy: IfNotPresent
+    tag: 6.5.1
+  resources: {}
+    # limits:
+    #   cpu: 100m
+    #   memory: 128Mi
+    # requests:
+    #   cpu: 100m
+    #   memory: 128Mi
+  securityContext: {}
+    # capabilities:
+    #   drop:
+    #   - ALL
+    # readOnlyRootFilesystem: true
+    # runAsNonRoot: true
+    # runAsUser: 1000
+
+
 nameOverride: ""
 fullnameOverride: ""
+imagePullSecrets: []
 
-varnishSize: 100M
 
 serviceAccount:
   # Specifies whether a service account should be created
@@ -47,14 +125,6 @@ podAnnotations: {}
 
 podSecurityContext: {}
   # fsGroup: 2000
-
-securityContext: {}
-  # capabilities:
-  #   drop:
-  #   - ALL
-  # readOnlyRootFilesystem: true
-  # runAsNonRoot: true
-  # runAsUser: 1000
 
 service:
   type: ClusterIP
@@ -73,17 +143,6 @@ ingress:
   #    hosts:
   #      - chart-example.local
 
-resources: {}
-  # We usually recommend not to specify default resources and to leave this as a conscious
-  # choice for the user. This also increases chances charts run on environments with little
-  # resources, such as Minikube. If you do want to specify resources, uncomment the following
-  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
-  # limits:
-  #   cpu: 100m
-  #   memory: 128Mi
-  # requests:
-  #   cpu: 100m
-  #   memory: 128Mi
 
 autoscaling:
   enabled: false
@@ -97,8 +156,3 @@ nodeSelector: {}
 tolerations: []
 
 affinity: {}
-
-vcl:
-  default.vcl: |-
-          vcl 5.0;
-          # hello world config
