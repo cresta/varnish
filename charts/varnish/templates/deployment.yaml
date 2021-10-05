@@ -35,7 +35,11 @@ spec:
             name: {{ include "varnish.fullname" . }}-varnish
         - name: nginx
           configMap:
+{{- if .Values.nginx.customconfig -}}
+            name: {{ .Values.nginx.customconfig_name }}
+{{- else }}
             name: {{ include "varnish.fullname" . }}-nginx
+{{- end }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
