@@ -1,11 +1,41 @@
-{{- if .Values.nginx.customconfig -}}
-{{- else }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
   name: {{ include "varnish.fullname" . }}-nginx
   labels:
     {{- include "varnish.labels" . | nindent 4 }}
+{{- if .Values.nginx.directorCustomConfig -}}
+data:
+  nginx.conf: |-
+    events {}
+    http {
+      server { # simple reverse-proxy
+        listen       81;
+        location /health {
+          return 200 'status: ok';
+          access_log off;
+        }
+        # pass requests for dynamic content to rails/turbogears/zope, et al
+        location / {
+          rewrite /next-gen/(.*) /$1  break;
+          resolver kube-dns.kube-system.svc.cluster.local ipv6=off;
+          proxy_pass https://$http_x_goto;
+          proxy_set_header Host $http_x_goto;
+        }
+        location /director/ {
+          proxy_pass http://cdn-{{ .Values.nginx.cdnType }}.cresta.com/director-{{ .Values.nginx.directorVersion }}/;
+          proxy_set_header Host cdn-staging.cresta.com;
+          proxy_intercept_errors on;
+          error_page 404 = @cdnnotfound;
+        }
+        location @cdnnotfound {
+          rewrite /(.*) /director-{{ .Values.nginx.directorVersion }}/index.html?from=$1 break;
+          proxy_pass http://cdn-{{ .Values.nginx.cdnType }}.cresta.com;
+          proxy_set_header Host cdn-{{ .Values.nginx.cdnType }}.cresta.com;
+        }
+      }
+    }
+{{- else }}
 data:
 {{ toYaml .Values.nginx.config | indent 2 }}
 {{- end }}
