@@ -19,6 +19,8 @@ nginx:
     # readOnlyRootFilesystem: true
     # runAsNonRoot: true
     # runAsUser: 1000
+
+# customconfig: "testing"
   config:
     nginx.conf: |-
       events {}

@@ -15,7 +15,9 @@ spec:
     metadata:
       annotations:
         checksum/varnish: {{ include (print $.Template.BasePath "/configmap-vcl.yaml") . | sha256sum }} 
+{{- if not .Values.nginx.customconfig }}
         checksum/nginx: {{ include (print $.Template.BasePath "/configmap-nginx.yaml") . | sha256sum }} 
+{{- end -}}
       {{- with .Values.podAnnotations }}
         {{- toYaml . | nindent 8 }}
       {{- end }}
@@ -35,7 +37,11 @@ spec:
             name: {{ include "varnish.fullname" . }}-varnish
         - name: nginx
           configMap:
+{{- if .Values.nginx.customconfig }}
+            name: {{ .Values.nginx.customconfig }}
+{{- else }}
             name: {{ include "varnish.fullname" . }}-nginx
+{{ end }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
