@@ -21,7 +21,7 @@ jobs:
         run:  helm install varnish ./charts/varnish
       - name: Wait for deployment to finish
         timeout-minutes: 1
-        run:  sleep 10 && kubectl get pods -o yaml && kubectl describe pods && kubectl rollout status --watch deployment/varnish
+        run:  kubectl rollout status --watch deployment/varnish
       - name: Test helm chart
         run:  helm test varnish
       - name: Remove helm chart
