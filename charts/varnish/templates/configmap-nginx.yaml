@@ -1,3 +1,4 @@
+{{- if not .Values.nginx.customconfig }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -6,3 +7,4 @@ metadata:
     {{- include "varnish.labels" . | nindent 4 }}
 data:
 {{ toYaml .Values.nginx.config | indent 2 }}
+{{- end -}}
