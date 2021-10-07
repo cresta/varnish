@@ -1,5 +1,5 @@
 # varnish
-Custom varnish helm chart for Cresta.
+Custom varnish helm chart for Cresta and others.
 
 This chart is intended to have varnish forward to nginx, which
 can forward downstream.  Nginx is used so that we can connect to SSL
