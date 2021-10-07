@@ -20,6 +20,8 @@ nginx:
     # runAsNonRoot: true
     # runAsUser: 1000
 
+# nginx.customconfig allows setting the name of a custom config file generated
+# outside this helm chart
 # customconfig: "testing"
   config:
     nginx.conf: |-
