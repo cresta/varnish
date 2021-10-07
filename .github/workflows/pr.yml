@@ -1,9 +1,9 @@
-name: Release Charts
+name: Test chart changes
 
 on: [push, pull_request]
 
 jobs:
-  release:
+  charttest:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
