@@ -12,7 +12,7 @@ jobs:
           fetch-depth: 0
       - name: Run chart-testing (lint)
         id: lint
-        uses: helm/chart-testing-action@v2.3.1
+        uses: helm/chart-testing-action@v2.4.0
         with:
           command: lint
       - name: Create kind cluster
