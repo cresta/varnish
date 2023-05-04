@@ -3,6 +3,20 @@ entries:
   varnish:
   - apiVersion: v2
     appVersion: 6.5.1-a
+    created: "2023-05-04T23:02:12.200236088Z"
+    description: A Helm chart for varnish on Kubernetes
+    digest: d34b33c2a9963dc639719a75443d68f3dd32b48244cf3399b3fa366019d195e0
+    home: https://github.com/cresta/varnish
+    maintainers:
+    - name: cep21
+      url: https://github.com/cep21
+    name: varnish
+    type: application
+    urls:
+    - https://github.com/cresta/varnish/releases/download/varnish-0.3.3/varnish-0.3.3.tgz
+    version: 0.3.3
+  - apiVersion: v2
+    appVersion: 6.5.1-a
     created: "2021-10-07T04:47:13.69136387Z"
     description: A Helm chart for varnish on Kubernetes
     digest: a8db5bc741f60ad6d2063f39a717917764d31be815d84feb428ef7067957af41
@@ -43,4 +57,4 @@ entries:
     urls:
     - https://github.com/cresta/varnish/releases/download/varnish-0.2.0/varnish-0.2.0.tgz
     version: 0.2.0
-generated: "2021-03-26T23:04:15.719110312Z"
+generated: "2023-05-04T23:02:12.200252788Z"
