@@ -16,7 +16,7 @@ jobs:
         with:
           command: lint
       - name: Create kind cluster
-        uses: helm/kind-action@v1.7.0
+        uses: helm/kind-action@v1.8.0
       - name: Install helm chart
         run:  helm install varnish ./charts/varnish
       - name: Remove helm chart
