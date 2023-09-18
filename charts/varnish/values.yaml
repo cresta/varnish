@@ -46,7 +46,7 @@ varnish:
   image:
     repository: varnish
     pullPolicy: IfNotPresent
-    tag: 7.2.1
+    tag: 7.4.0
   varnishSize: 100M
   resources: {}
     # limits:
@@ -94,7 +94,7 @@ varnishncsa:
   image:
     repository: varnish
     pullPolicy: IfNotPresent
-    tag: 7.2.1
+    tag: 7.4.0
   resources: {}
     # limits:
     #   cpu: 100m
